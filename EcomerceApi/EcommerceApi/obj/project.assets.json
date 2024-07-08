@@ -1170,11 +1170,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\luiz.alberto\\Desktop\\Curso Net C#\\Projetos\\RepositorioC-FC\\RepositorioC-FC\\EcomerceApi\\EcommerceApi\\EcommerceApi.csproj",
+      "projectUniqueName": "c:\\Users\\luiz.alberto\\Desktop\\Curso Net C#\\Projetos\\RepositorioEcommerceAPI\\EcommerApi_Teste\\EcomerceApi\\EcommerceApi\\EcommerceApi.csproj",
       "projectName": "EcommerceApi",
-      "projectPath": "C:\\Users\\luiz.alberto\\Desktop\\Curso Net C#\\Projetos\\RepositorioC-FC\\RepositorioC-FC\\EcomerceApi\\EcommerceApi\\EcommerceApi.csproj",
+      "projectPath": "c:\\Users\\luiz.alberto\\Desktop\\Curso Net C#\\Projetos\\RepositorioEcommerceAPI\\EcommerApi_Teste\\EcomerceApi\\EcommerceApi\\EcommerceApi.csproj",
       "packagesPath": "C:\\Users\\luiz.alberto\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\luiz.alberto\\Desktop\\Curso Net C#\\Projetos\\RepositorioC-FC\\RepositorioC-FC\\EcomerceApi\\EcommerceApi\\obj\\",
+      "outputPath": "c:\\Users\\luiz.alberto\\Desktop\\Curso Net C#\\Projetos\\RepositorioEcommerceAPI\\EcommerApi_Teste\\EcomerceApi\\EcommerceApi\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\luiz.alberto\\AppData\\Roaming\\NuGet\\NuGet.Config"

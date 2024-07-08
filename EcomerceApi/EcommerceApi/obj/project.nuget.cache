@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "IWQ73Ng4tSjS4HltUC9VRnTbPysICZOeLQM2r8VmnqvB7w5L9KSPFJVSei8I8Y7pXX4naFqCn7x0Wazz1NY9Jg==",
+  "dgSpecHash": "qQnl+/gDWtkkMmHhVogmZygC8HDjCE31fIIPJ/2tAWGOmY3sqEPc7YBIvlIFvLunwul0odoFXXhxogdO54oTDQ==",
   "success": true,
-  "projectFilePath": "C:\\Users\\luiz.alberto\\Desktop\\Curso Net C#\\Projetos\\RepositorioC-FC\\RepositorioC-FC\\EcomerceApi\\EcommerceApi\\EcommerceApi.csproj",
+  "projectFilePath": "C:\\Users\\luiz.alberto\\Desktop\\Curso Net C#\\Projetos\\RepositorioEcommerceAPI\\EcommerApi_Teste\\EcomerceApi\\EcommerceApi\\EcommerceApi.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\luiz.alberto\\.nuget\\packages\\microsoft.aspnetcore.openapi\\8.0.4\\microsoft.aspnetcore.openapi.8.0.4.nupkg.sha512",
     "C:\\Users\\luiz.alberto\\.nuget\\packages\\microsoft.entityframeworkcore\\8.0.6\\microsoft.entityframeworkcore.8.0.6.nupkg.sha512",
