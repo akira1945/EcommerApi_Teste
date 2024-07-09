@@ -1,4 +1,4 @@
-namespace EcommerceApi.ClientsDTOs
+namespace EcommerceApi.DTOs
 {
     public class researchClientsDto
     {

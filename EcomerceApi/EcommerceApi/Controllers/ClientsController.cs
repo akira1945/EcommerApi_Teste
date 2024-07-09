@@ -1,11 +1,9 @@
 using System.Text;
-using EcommerceApi.ClientsDTOs;
+using EcommerceApi.DTOs;
 using EcommerceApi.Data;
 using EcommerceApi.Models;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace EcommerceApi.Controllers
 {
@@ -31,7 +29,7 @@ namespace EcommerceApi.Controllers
         }
 
         // Metodo para Ler clientes por ID
-        [HttpGet]
+        [HttpPost("researh_client")]
         [Consumes("application/json")]
         public async Task<ActionResult<Client>> GetId([FromBody] researchClientsDto researchClientsId )
         {
@@ -102,7 +100,7 @@ namespace EcommerceApi.Controllers
         //Metodo para deletar um cadastro
         [HttpDelete]
         [Consumes("application/json")]
-        public async Task<IActionResult> GetDelete([FromBody] deleteClientsDto deleteClients)
+        public async Task<IActionResult> Delete([FromBody] deleteClientsDto deleteClients)
         {
             var client = await _dbContext.Clients.FirstOrDefaultAsync(c => c.id == deleteClients.id || c.cpf_cnpj == deleteClients.cpf_cnpj);
             if(client == null)

@@ -4,7 +4,7 @@ using EcommerceApi.Data;
 using Microsoft.EntityFrameworkCore;
 using EcommerceApi.Models;
 
-namespace EcommerceApi.SellersServices
+namespace EcommerceApi.Services
 {
     [ApiController]
     [Route("services")]
@@ -17,23 +17,21 @@ namespace EcommerceApi.SellersServices
             _dbContext = dbContext;
         }
     
-    [HttpGet]
-     public virtual async Task<ActionResult<Seller>> GetNextReferenceAsync(string newReference)
+     public async Task<string> GetNextReferenceAsync()
         {
         // Busca todas as referências no banco de dados e extrai os números
-        var maxNumber = await _dbContext.Sellers
+         var maxNumber = await _dbContext.Sellers
             .Where(s => s.reference.StartsWith("REF"))
-            .Select(s => int.Parse(s.reference.Substring(3))) // Extrai o número da referência
-            .DefaultIfEmpty(0) // Se não houver referências, usa 0
-            .MaxAsync();
-
-        // Incrementa o número máximo encontrado
-        int nextNumber = maxNumber + 1;
+            .Select(s => int.Parse(s.reference.Substring(3))) 
+            .DefaultIfEmpty(0) 
+            .MaxAsync();       
+        
+         int nextNumber = maxNumber + 1;
          
-        // Gera a nova referência no formato "REF0001"
-         newReference = $"REF{nextNumber:D4}";
+        
+         string newReference = $"REF{nextNumber:D4}";
 
-            return Ok($"Nova Referencia {newReference}");      
+            return newReference;      
         }
         
         

@@ -1,4 +1,4 @@
-namespace EcommerceApi.SellersDTOs
+namespace EcommerceApi.DTOs
 {
     public class createSellersDto
     {
@@ -6,9 +6,7 @@ namespace EcommerceApi.SellersDTOs
         public required string reference { get; set; }
         public string? phone { get; set; }
         public required string email { get; set; }
-        public required string password { get; set; }
-
-        
+        public required string password { get; set; }        
     }
 
     public class researchSellersDto
@@ -30,6 +28,11 @@ namespace EcommerceApi.SellersDTOs
     {
         public int id { get; set; }
         public required string reference { get; set; }
+    }
+
+      public class deleteSellersIdDto
+    {
+        public int id { get; set; }
     }
     public class servicesSellersModelReferenceDto
     {

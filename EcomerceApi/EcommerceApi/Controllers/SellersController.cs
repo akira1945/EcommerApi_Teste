@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using EcommerceApi.Data;
-using EcommerceApi.SellersDTOs;
+using EcommerceApi.DTOs;
 using EcommerceApi.Models;
-using EcommerceApi.SellersServices;
+using EcommerceApi.Services;
 using Microsoft.EntityFrameworkCore;
 
-namespace SellersController
+namespace EcommerceApi.Controller
 {
     [ApiController]
     [Route("sellers")]
@@ -25,7 +25,7 @@ namespace SellersController
             return Ok(sellers);
         }
 
-        [HttpGet]
+        [HttpPost("research_seller")]
         [Consumes("application/json")]
         public async Task<ActionResult<Seller>> GetResearch([FromBody] researchSellersDto researchSellers)
         {
@@ -39,11 +39,12 @@ namespace SellersController
 
         [HttpPost]
         [Consumes("application/json")]
-        public async Task<ActionResult<Seller>> Create([FromBody] createSellersDto createSellers)
-        {    var existReference = await _dbContext.Sellers.AnyAsync(s => s.reference == createSellers.reference);
+        public async Task<ActionResult<Seller>> Create([FromBody] createSellersDto createSellers,[FromServices] SellersServices sellersServices)
+        {    var existReference = await _dbContext.Sellers.AnyAsync(s => s.reference == createSellers.reference);            
              if(existReference)
-             {         
-                return BadRequest($@"Referencia: {createSellers.reference}, não pode ser utilizada, já existe um cadastro para sequencia! Ultima sequencial utilizado : {EcommerceApi.SellersServices.SellersServices.Empty}");
+             { 
+                var newReferenceX  = sellersServices.GetNextReferenceAsync();                
+                return BadRequest($@"Referencia: {createSellers.reference}, não pode ser utilizada, já existe um cadastro para sequencia! Ultimo sequencial utilizado : {newReferenceX}");
              };
 
             var seller = new Seller
@@ -80,7 +81,7 @@ namespace SellersController
             await _dbContext.SaveChangesAsync();
             return Ok(seller);
         }
-        [HttpDelete]
+        [HttpPost("delete_sellers_id_ref")]
         [Consumes("application/json")]
         public async Task<ActionResult<Seller>> Delete([FromBody] deleteSellersDto deleteSellers)
         {
@@ -93,6 +94,21 @@ namespace SellersController
             await _dbContext.SaveChangesAsync();
             return Ok($"Cadastro excluido com sucesso!!! Referencia {deleteSellers.reference}, pode ser utilizada novamente.");
         }
-       
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteId(int id)
+        {
+            var seller = await _dbContext.Sellers.FirstOrDefaultAsync(s => s.id == id);
+            if(seller ==  null)
+            {
+                return NotFound($"Exclusão não executada, valide o ID: {id}");
+            }
+            _dbContext.Sellers.Remove(seller);
+            await _dbContext.SaveChangesAsync();
+            return Ok();
+        }
+
+      
     }
+
 }
