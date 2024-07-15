@@ -1,4 +1,4 @@
-namespace EcommerceApi.ProductsDTOs
+namespace EcommerceApi.DTOs
 {
     public class CreateProductDto
     {
@@ -39,6 +39,36 @@ namespace EcommerceApi.ProductsDTOs
         public int? id { get; set; }
         public string? title { get; set; }
         public string?  description { get; set; }
+    }
+
+     public class DeleteSqlDto
+    {
+        public int id { get; set; }
+        
+    }
+
+    public class ListProductSqlDto
+    {
+        public int id { get; set; }
+        public string? title { get; set; }
+        public string?  description { get; set; }
+        public int? stock { get; set; }
+    }
+
+    public class UpdateProductSqlDto
+    {
+        public int id { get; }
+        public string? title { get; set; }
+        public string? description { get; set; }
+        public string? image_url { get; set; }
+        public float? price { get; set; }
+        public int? stock { get; set; }
+    }
+
+    public class ProductToCreateOrderDto
+    {
+        public int id { get; set; }
+        public int quantity { get; set; }
     }
 
 }

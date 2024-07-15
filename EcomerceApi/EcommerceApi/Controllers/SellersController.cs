@@ -4,6 +4,7 @@ using EcommerceApi.DTOs;
 using EcommerceApi.Models;
 using EcommerceApi.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
 
 namespace EcommerceApi.Controller
 {
@@ -37,7 +38,7 @@ namespace EcommerceApi.Controller
             return Ok(sellers);
         }
 
-        [HttpPost]
+        [HttpPost("create_seller")]
         [Consumes("application/json")]
         public async Task<ActionResult<Seller>> Create([FromBody] createSellersDto createSellers,[FromServices] SellersServices sellersServices)
         {    var existReference = await _dbContext.Sellers.AnyAsync(s => s.reference == createSellers.reference);            

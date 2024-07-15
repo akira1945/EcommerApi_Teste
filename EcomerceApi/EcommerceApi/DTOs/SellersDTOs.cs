@@ -34,7 +34,7 @@ namespace EcommerceApi.DTOs
     {
         public int id { get; set; }
     }
-    public class servicesSellersModelReferenceDto
+    public class ServicesSellersModelReferenceDto
     {
         public required string reference { get; set; }
     }

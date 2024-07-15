@@ -9,6 +9,8 @@ namespace EcommerceApi.Data
         public DbSet<Client> Clients { get; set; }
         public DbSet<Seller> Sellers { get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<Order_item> Order_Items { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -17,6 +19,10 @@ namespace EcommerceApi.Data
             modelBuilder.Entity<Seller>().ToTable("sellers");
 
             modelBuilder.Entity<Product>().ToTable("products");
+
+            modelBuilder.Entity<Order>().ToTable("orders");
+
+            modelBuilder.Entity<Order_item>().ToTable("order_items");
         }
     }
 
