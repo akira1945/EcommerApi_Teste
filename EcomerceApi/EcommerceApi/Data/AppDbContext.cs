@@ -11,6 +11,7 @@ namespace EcommerceApi.Data
         public DbSet<Product> Products { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<Order_item> Order_Items { get; set; }
+        public object Seller { get; internal set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

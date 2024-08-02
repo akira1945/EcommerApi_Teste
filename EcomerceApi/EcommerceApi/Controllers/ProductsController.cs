@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
 using System.Collections;
 using System.Reflection.Metadata;
+using EcommerceApi.Repositories;
 
 
 namespace EcommerceApi.Controllers
@@ -15,28 +16,24 @@ namespace EcommerceApi.Controllers
     [Route("products")]
     public class ProductsController : ControllerBase
     {
-        private readonly AppDbContext _dbContext;
+        private readonly ProductRepository _productRepository;
 
-        public ProductsController(AppDbContext dbContext)
+        public ProductsController(ProductRepository productRepository)
         {
-            _dbContext = dbContext;
+            _productRepository = productRepository;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> GetAll()
+        public async Task<ActionResult<IEnumerable>> GetAll()
         {
-            var product = await _dbContext.Products.ToListAsync();
-            if (product == null)
-            {
-                return NotFound("Product Not Found");
-            }
+            var product = await _productRepository.GetAll();
             return Ok(product);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetId(int id)
         {
-            var product = await _dbContext.Products.FirstOrDefaultAsync(p => p.id == id);
+            var product = await _productRepository.GetId(id);
             if (product == null)
             {
                 return NotFound("Product Not Found");
@@ -48,91 +45,39 @@ namespace EcommerceApi.Controllers
         [Consumes("application/json")]
         public async Task<ActionResult<IEnumerable<Product>>> ListPorductSql([FromBody] ListProductSqlDto listProductSql)
         {
-            var vSql = $@"SELECT * FROM products WHERE id = @id ;";
+            var product = await _productRepository.ListPorductSql(listProductSql);
 
-            var parameters_get = new[]
-            {
-                new Npgsql.NpgsqlParameter("id", listProductSql.id)
-            };
-
-            var product_sql = await _dbContext.Products.FromSqlRaw(vSql, parameters_get).ToListAsync();
-
-            if (product_sql == null || product_sql.Count == 0)
+            if (product == null)
             {
                 return NotFound("Product Not Found");
             }
 
-            return Ok(product_sql);
+            return Ok(product);
         }
 
         [HttpPost("create_product")]
         [Consumes("application/json")]
-        public async Task<ActionResult<Product>> CreateProduct([FromBody] CreateProductDto createProduct)
+        public ActionResult<Product> CreateProduct([FromBody] CreateProductDto createProduct)
         {
-            var product = new Product
-            {
-                title = createProduct.title,
-                description = createProduct.description,
-                image_url = createProduct.image_url,
-                price = createProduct.price,
-                stock = createProduct.stock,
-            };
-            _dbContext.Products.Add(product);
-            await _dbContext.SaveChangesAsync();
+            var product = _productRepository.CreateProduct(createProduct);
+
             return Ok(product);
         }
 
         [HttpPost("created_product_sql")]
         [Consumes("application/json")]
-        public async Task<ActionResult<Product>> CreateProductSql([FromBody] CreateProductDto createProduct)
+        public ActionResult<Product> CreateProductSql([FromBody] CreateProductDto createProduct)
         {
-
-            var sql_minus_url = $@"
-                INSERT INTO products (title, description, price, stock)
-                VALUES (@title, @description, @price, @stock)
-                RETURNING *;";
-
-            if (createProduct.image_url == null)
-            {
-                var parameters_incomplete = new[]
-                {
-                new Npgsql.NpgsqlParameter("title", createProduct.title),
-                new Npgsql.NpgsqlParameter("description", createProduct.description),
-                new Npgsql.NpgsqlParameter("price", createProduct.price),
-                new Npgsql.NpgsqlParameter("stock", createProduct.stock)
-            };
-
-                var product_incomplete = _dbContext.Products.FromSqlRaw(sql_minus_url, parameters_incomplete).AsEnumerable();
-
-                return Ok(product_incomplete);
-            }
-
-            var sql_url = $@"
-                INSERT INTO products (title, description, price, image_url, stock)
-                VALUES (@title, @description, @price, @image_url, @stock)
-                RETURNING *;";
-
-            var parameters = new[]
-            {
-                new Npgsql.NpgsqlParameter("title", createProduct.title),
-                new Npgsql.NpgsqlParameter("description", createProduct.description),
-                new Npgsql.NpgsqlParameter("price", createProduct.price),
-                new Npgsql.NpgsqlParameter("image_url", createProduct.image_url),
-                new Npgsql.NpgsqlParameter("stock", createProduct.stock)
-            };
-
-            var product = _dbContext.Products.FromSqlRaw(sql_url, parameters).AsEnumerable();
+            var product = _productRepository.CreateProductSql(createProduct);
 
             return Ok(product);
-
-            ;
         }
 
         [HttpPost("list_prod_stock")]
         [Consumes("application/json")]
         public async Task<ActionResult<Product>> ListProduct([FromBody] ListProductStockDto productStock)
         {
-            var product = await _dbContext.Products.FirstOrDefaultAsync(p => p.id == productStock.id || p.title == productStock.title);
+            var product = await _productRepository.ListProduct(productStock);
             if (product == null)
             {
                 return NotFound("Product Not Found");
@@ -148,18 +93,11 @@ namespace EcommerceApi.Controllers
         [Consumes("application/json")]
         public async Task<ActionResult<Product>> UpdatePorductString(int id, [FromBody] UpdateProductDto updateProduct)
         {
-            var product = await _dbContext.Products.FirstOrDefaultAsync(p => p.id == id);
+            var product = await _productRepository.UpdatePorductString(id, updateProduct);
             if (product == null)
             {
                 return NotFound("Product Not Found");
             }
-            else
-            {
-                if (updateProduct.title != null && updateProduct.title != product.title) { product.title = updateProduct.title; };
-                if (updateProduct.description != null && updateProduct.description != product.description) { product.description = updateProduct.description; };
-                if (updateProduct.image_url != null && updateProduct.image_url != product.image_url) { product.image_url = updateProduct.image_url; };
-            }
-            await _dbContext.SaveChangesAsync();
             return Ok(product);
         }
 
@@ -167,20 +105,16 @@ namespace EcommerceApi.Controllers
         [Consumes("application/json")]
         public async Task<ActionResult<Product>> UpdatePorductPrice(int id, [FromBody] UpdatePriceProductDto updateProduct)
         {
-            var product = await _dbContext.Products.FirstOrDefaultAsync(p => p.id == id);
+            var product = await _productRepository.UpdatePorductPrice(id, updateProduct);
             if (product == null)
             {
                 return NotFound("Product Not Found");
             }
-            else if (product.price < 0)
+            else if (updateProduct.price < 0)
             {
-                return BadRequest("Product Price Negative or Null");
+                return BadRequest($"Product {id} Price {updateProduct.price} Negative");
             }
-            else
-            {
-                if (updateProduct.price != null && updateProduct.price != product.price) { product.price = (float)updateProduct.price; };
-            }
-            await _dbContext.SaveChangesAsync();
+
             return Ok(product);
         }
 
@@ -188,76 +122,29 @@ namespace EcommerceApi.Controllers
         [Consumes("application/json")]
         public async Task<ActionResult<Product>> UpdatePorductStock(int id, [FromBody] UpdateStockProductDto updateProduct)
         {
-            var product = await _dbContext.Products.FirstOrDefaultAsync(p => p.id == id);
+            var product = await _productRepository.UpdatePorductStock(id, updateProduct);
             if (product == null)
             {
                 return NotFound("Product Not Found");
             }
-            else if (updateProduct.stock < 0)
+            if (updateProduct.stock <= 0)
             {
                 return BadRequest("Product Stock Negative or Null");
             }
-            else
-            {
-                if (updateProduct.stock != null && updateProduct.stock != product.stock) { product.stock = (int)updateProduct.stock; };
-            }
-            await _dbContext.SaveChangesAsync();
+
             return Ok(product);
         }
 
         [HttpPut("update_prod_sql/{id}")]
         [Consumes("application/json")]
-        public async Task<ActionResult<Product>> UpdateProductSql(int id,[FromBody] UpdateProductSqlDto updateSql)
+        public ActionResult<Product> UpdateProductSql(int id, [FromBody] UpdateProductSqlDto updateSql)
         {
-            var updates = new List<String>();
-            var parameters = new List<Npgsql.NpgsqlParameter>            
+            var product_update = _productRepository.UpdateProductSql(id, updateSql);
+
+            if (product_update == null)
             {
-                new Npgsql.NpgsqlParameter("id" , id),               
-            };
-             
-             if(updateSql.title != null)
-             {
-                updates.Add("title = @title");                
-                parameters.Add(new Npgsql.NpgsqlParameter("title" , updateSql.title));
-             }
-             if(updateSql.description != null)
-             {
-                updates.Add("description = @description");                
-                parameters.Add(new Npgsql.NpgsqlParameter("description" , updateSql.description));
-             }
-             if(updateSql.image_url != null)
-             {
-                updates.Add("image_url = @image_url");                
-                parameters.Add(new Npgsql.NpgsqlParameter("image_url" , updateSql.image_url));
-             }
-             if(updateSql.price != null)
-             {
-                updates.Add("price = @price");                
-                parameters.Add(new Npgsql.NpgsqlParameter("price" , updateSql.price));
-             }
-             if(updateSql.stock != null)
-             {
-                updates.Add("stock = @stock");                
-                parameters.Add(new Npgsql.NpgsqlParameter("stock" , updateSql.stock));
-             }
-
-             if(updates.Count == 0)
-             {
-                return NotFound("Update Invalid!");
-             }
-
-             var setUpdate = string.Join(", ", updates);
-
-             var vSql = $@"UPDATE products
-                              SET {setUpdate}
-                            WHERE id = @id RETURNING *;";
-            
-             var product_update = _dbContext.Products.FromSqlRaw(vSql, parameters.ToArray()).AsEnumerable().FirstOrDefault();
-
-             if(product_update == null)
-             {
                 return NotFound("Product NOT FOUND");
-             }
+            }
 
 
             return Ok(product_update);
@@ -266,13 +153,8 @@ namespace EcommerceApi.Controllers
         [HttpDelete("delete_product/{id}")]
         public async Task<ActionResult> DeleteId(int id)
         {
-            var product = await _dbContext.Products.FirstOrDefaultAsync(s => s.id == id);
-            if (product == null)
-            {
-                return NotFound("Product Not Found");
-            }
-            _dbContext.Products.Remove(product);
-            await _dbContext.SaveChangesAsync();
+            var product = await _productRepository.DeleteId(id);
+            if (product == null) { return NotFound("Product Not Found"); }
             return Ok("Product Deleted Sucesse");
         }
 
@@ -280,17 +162,9 @@ namespace EcommerceApi.Controllers
         [Consumes("application/json")]
         public async Task<ActionResult<Product>> DeleteSql([FromBody] DeleteSqlDto deleteSql)
         {
-            var sql_delete = $@"DELETE FROM products WHERE id = @id RETURNING *;";
-
-            var param_delete = new[] { new Npgsql.NpgsqlParameter("id", deleteSql.id) };
-
-            var product_delete = _dbContext.Products.FromSqlRaw(sql_delete, param_delete).AsEnumerable().FirstOrDefault();
-
-            await _dbContext.SaveChangesAsync();
-
+            var product_delete = await _productRepository.DeleteSql(deleteSql);
             return Ok(product_delete);
         }
-
 
 
     }

@@ -10,12 +10,15 @@ namespace EcommerceApi.Models
         public string delivery_type { get; set; }
         public string order_status { get; set; }
         public decimal total_price { get; set; }
+        [NotMapped]
         public string? client_name { get; set; }
+        [NotMapped]
         public string? seller_name { get; set; }
         [NotMapped]
         public IEnumerable<Order_item>? order_Items { get; set; }
-        [NotMapped]
-        public int order_id { get; set; }
+      //  [NotMapped]
+     //   public int? order_id { get; set; }
+        
                 
     }
 }

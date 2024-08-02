@@ -5,6 +5,7 @@ using EcommerceApi.Models;
 using EcommerceApi.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
+using EcommerceApi.Repositories;
 
 namespace EcommerceApi.Controller
 {
@@ -13,103 +14,99 @@ namespace EcommerceApi.Controller
 
     public class SellersController : ControllerBase
     {
-        private readonly AppDbContext _dbContext;        
-        public SellersController(AppDbContext dbContext)
+
+        private readonly SellersRepository _sellersRepository;
+        private readonly SellersServices _sellersServices;
+
+        public SellersController(SellersRepository sellersRepository, SellersServices sellersServices)
         {
-            _dbContext = dbContext;
+            _sellersRepository = sellersRepository;
+            _sellersServices = sellersServices;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Seller>>> GetAll()
         {
-            var sellers = await _dbContext.Sellers.ToListAsync();
+            var sellers = await _sellersRepository.GetAll();
             return Ok(sellers);
         }
+
 
         [HttpPost("research_seller")]
         [Consumes("application/json")]
-        public async Task<ActionResult<Seller>> GetResearch([FromBody] researchSellersDto researchSellers)
+        public async Task<ActionResult<Seller>> Research([FromBody] researchSellersDto research)
         {
-            var sellers = await _dbContext.Sellers.FirstOrDefaultAsync( s => s.id == researchSellers.id && s.reference == researchSellers.reference);
-            if(sellers == null)
+            var sellers = await _sellersRepository.GetResearch(research);
+            if (sellers == null)
             {
-                return NotFound( $"Vendedor(a) não encontrado. Id: {researchSellers.id} e a Referencia: {researchSellers.reference} invalidados!");
+                return NotFound($"Vendedor(a) não encontrado. Id: {research.id} e a Referencia: {research.reference} invalidados!");
             }
             return Ok(sellers);
         }
 
+
         [HttpPost("create_seller")]
         [Consumes("application/json")]
-        public async Task<ActionResult<Seller>> Create([FromBody] createSellersDto createSellers,[FromServices] SellersServices sellersServices)
-        {    var existReference = await _dbContext.Sellers.AnyAsync(s => s.reference == createSellers.reference);            
-             if(existReference)
-             { 
-                var newReferenceX  = sellersServices.GetNextReferenceAsync();                
-                return BadRequest($@"Referencia: {createSellers.reference}, não pode ser utilizada, já existe um cadastro para sequencia! Ultimo sequencial utilizado : {newReferenceX}");
-             };
-
-            var seller = new Seller
-            {
-                name = createSellers.name, 
-                reference = createSellers.reference, 
-                phone = createSellers.phone, 
-                email = createSellers.email, 
-                password = createSellers.password
-            };           
-            
-            _dbContext.Sellers.Add(seller);
-            await _dbContext.SaveChangesAsync();
-            return Ok(seller);
-        }
-
-        [HttpPut]
-        [Consumes("application/json")]
-        public async Task<ActionResult<Seller>> updateSellers([FromBody] updateSellersDto updateSellers)
+        public async Task<ActionResult<Seller>> Create([FromBody] createSellersDto createSellers)
         {
-            var seller = await _dbContext.Sellers.FirstOrDefaultAsync( s => s.id == updateSellers.id);
-            if(seller == null)
+            var Reference = await _sellersRepository.Create(createSellers);
+
+            if (Reference == null)
             {
-                return NotFound($"Cadastro de vendedor não encontrado, por favor, valide o Id: {updateSellers.id} !!!");
+                return BadRequest($@"Referencia {createSellers.reference} já existe, por favor, utilize outra!");
             }
-            else
-            {
-                if(updateSellers.name != null){seller.name = updateSellers.name;};
-                if(updateSellers.reference != null){seller.reference = updateSellers.reference;};
-                if(updateSellers.phone != null){seller.phone = updateSellers.phone;};
-                if(updateSellers.email != null){seller.email = updateSellers.email;};
-                if(updateSellers.password != null){seller.password = updateSellers.password;};
-            }
-            await _dbContext.SaveChangesAsync();
-            return Ok(seller);
+
+            return Ok(Reference);
         }
+
+        [HttpPut("update_all")]
+        [Consumes("application/json")]
+        public async Task<ActionResult<Seller>> UpdateSellers([FromBody] updateSellersDto update)
+        {
+
+            bool validRef = _sellersServices.ValidReference(update.reference);
+
+            if (validRef) return BadRequest($"Referencia {update.reference} não pode ser utilizada!!!");
+
+
+            var seller = await _sellersRepository.update(update);
+
+            if (seller == null) return NotFound($"Cadastro de vendedor não encontrado. Por favor, valide o ID: {update.id}.");
+
+
+            return Ok(seller);
+
+        }
+
+
+
         [HttpPost("delete_sellers_id_ref")]
         [Consumes("application/json")]
         public async Task<ActionResult<Seller>> Delete([FromBody] deleteSellersDto deleteSellers)
         {
-            var seller = await _dbContext.Sellers.FirstOrDefaultAsync( s => s.id == deleteSellers.id && s.reference == deleteSellers.reference );
-            if(seller == null)
+            var seller = await _sellersRepository.Delete(deleteSellers);
+            if (seller == null)
             {
                 return NotFound($"Cadastro não encontrado, valide se o id: {deleteSellers.id} e a Referencia: {deleteSellers.reference}, estão corretas!");
             }
-            _dbContext.Sellers.Remove(seller);
-            await _dbContext.SaveChangesAsync();
+
             return Ok($"Cadastro excluido com sucesso!!! Referencia {deleteSellers.reference}, pode ser utilizada novamente.");
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("delete_sellers_id/{id}")]
         public async Task<ActionResult> DeleteId(int id)
         {
-            var seller = await _dbContext.Sellers.FirstOrDefaultAsync(s => s.id == id);
-            if(seller ==  null)
+            var seller = await _sellersRepository.DeleteId(id);
+            if (seller == null)
             {
                 return NotFound($"Exclusão não executada, valide o ID: {id}");
             }
-            _dbContext.Sellers.Remove(seller);
-            await _dbContext.SaveChangesAsync();
-            return Ok();
+
+            return Ok(seller);
         }
 
-      
+
     }
 
 }
+

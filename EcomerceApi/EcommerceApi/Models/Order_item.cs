@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace EcommerceApi.Models
 {
     public class Order_item
@@ -6,7 +8,9 @@ namespace EcommerceApi.Models
         public int order_id { get; set; }
         public int product_id { get; set; }
         public int quantity { get; set; }
+        [NotMapped]
         public decimal? product_price { get; set; }
+        [NotMapped]
         public string? product_title { get; set; }
         
 

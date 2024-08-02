@@ -1,3 +1,6 @@
+using System.ComponentModel.DataAnnotations.Schema;
+using EcommerceApi.Data;
+
 namespace EcommerceApi.Models
 {
     public class Seller
@@ -8,6 +11,7 @@ namespace EcommerceApi.Models
         public string? phone { get; set; }
         public required string email { get; set; }
         public required string password { get; set; }
+        
     }
 
 }
