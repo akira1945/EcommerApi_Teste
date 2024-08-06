@@ -11,6 +11,7 @@ namespace EcommerceApi.Models
         public string? phone { get; set; }
         public required string email { get; set; }
         public required string password { get; set; }
+        public IEnumerable<Order>? orders { get; set;}
         
     }
 

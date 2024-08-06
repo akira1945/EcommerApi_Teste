@@ -3,6 +3,8 @@ using EcommerceApi.Controllers;
 using EcommerceApi.Services;
 using Microsoft.EntityFrameworkCore;
 using EcommerceApi.Repositories;
+using System.Security.Cryptography;
+using EcommerceApi.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +19,8 @@ builder.Services.AddScoped<SellersServices>();
 builder.Services.AddControllers();
 
 var app = builder.Build();
+
+app.UseMiddleware<LoggingMiddlewares>();
 
 app.MapControllers();
 

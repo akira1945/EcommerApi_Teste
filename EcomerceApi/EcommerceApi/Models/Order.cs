@@ -15,10 +15,15 @@ namespace EcommerceApi.Models
         [NotMapped]
         public string? seller_name { get; set; }
         [NotMapped]
-        public IEnumerable<Order_item>? order_Items { get; set; }
-      //  [NotMapped]
-     //   public int? order_id { get; set; }
-        
+        public ICollection<Order_item>? order_items { get; set; }
+        [NotMapped]
+        public string? client_email { get; set; }
+        [NotMapped]
+        public string? seller_email { get; set; }
+
+        public Client? client { get; set; }
+
+        public Seller? seller { get; set; }
                 
     }
 }

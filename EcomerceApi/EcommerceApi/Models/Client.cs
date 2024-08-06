@@ -14,7 +14,10 @@ namespace EcommerceApi.Models
         public required string city { get; set; }
         public required string state { get; set; }
         public required string postal_code { get; set; }
-        public required string country { get; set; }      
+        public required string country { get; set; }   
+        public IEnumerable<Order>? orders { get; set; }
+        public IEnumerable<Shopping_cart>? shopping_Carts { get; set; }
+   
 
     }
 
