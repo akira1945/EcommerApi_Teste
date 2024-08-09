@@ -1,3 +1,4 @@
+using System.Security.Principal;
 using EcommerceApi.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,6 +14,7 @@ namespace EcommerceApi.Data
         public DbSet<Order_item> Order_Items { get; set; }
         public DbSet<Shopping_cart> Shopping_carts { get; set; }
         public DbSet<Shopping_cart_item> Shopping_Cart_Items { get; set; }
+        public DbSet<Token> Tokens { get; set; }
         public object Seller { get; internal set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -30,6 +32,8 @@ namespace EcommerceApi.Data
             modelBuilder.Entity<Shopping_cart>().ToTable("shopping_cart");
 
             modelBuilder.Entity<Shopping_cart_item>().ToTable("shopping_cart_item");
+            
+            modelBuilder.Entity<Token>().ToTable("tokens");
 
             modelBuilder.Entity<Order>()
                 .HasMany(o => o.order_items)

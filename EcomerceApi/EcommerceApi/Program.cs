@@ -16,6 +16,8 @@ builder.Services.AddScoped<ClientsRepository>();
 builder.Services.AddScoped<OrdersRepository>();
 builder.Services.AddScoped<ProductRepository>();
 builder.Services.AddScoped<SellersServices>();
+builder.Services.AddScoped<TokenServices>();
+
 builder.Services.AddControllers();
 
 var app = builder.Build();
