@@ -3,6 +3,7 @@ using EcommerceApi.Data;
 using EcommerceApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql;
 
 namespace  EcommerceApi.Services
 {
@@ -32,19 +33,7 @@ namespace  EcommerceApi.Services
             return encodeHash;
         }
 
-        public void Delete(string token)
-        {
-            var delToken =  _dbContext.Tokens.FirstOrDefault(t => t.token == token );
-
-            if(delToken != null)
-            {
-            _dbContext.Tokens.Remove(delToken);
-            _dbContext.SaveChangesAsync();
-            }
-        
-        }
-
-        public async Task<Token> Create()
+        public async Task<Token> GenerateAndSaveToken()
         {
             string generatedToken = this.GenerateToken();
 
@@ -60,6 +49,25 @@ namespace  EcommerceApi.Services
 
             return tokenToCreate;
         }
+    
+        public void Delete(string token)
+        {
+            var delToken =  _dbContext.Tokens.FirstOrDefault(t => t.token == token);
+
+            if(delToken != null)
+            {
+            _dbContext.Tokens.Remove(delToken);
+            _dbContext.SaveChangesAsync();
+            }
+       
+        
+        }
 
     }
 }
+
+// 1.As rotas de login (clients e sellers) elas ficam dentro do controller de clients e sellers (e os respectivos repositórios); 
+// 2.O método de geração de um novo token é INDEPENDENTE de qualquer controller, serviço ou repositório.
+// 3.Quem gera o token é o módulo de tokens (serviço). 
+// 4.O token deve ser gerado no login (e em todas as outras rotas) como sendo o ÚLTIMO PASSO do controller
+// 5.O módulo de tokens NÃO TEM CONTROLLER

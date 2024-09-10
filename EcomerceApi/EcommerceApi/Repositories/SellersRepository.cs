@@ -10,10 +10,12 @@ namespace EcommerceApi.Repositories
     public class SellersRepository
     {
         private readonly AppDbContext _dbContext;
+        private readonly TokenServices _tokenServices;
 
-        public SellersRepository(AppDbContext dbContext)
+        public SellersRepository(AppDbContext dbContext, TokenServices tokenServices)
         {
             _dbContext = dbContext;
+            _tokenServices = tokenServices;
         }
 
         public async Task<IEnumerable<Seller>> GetAll()
@@ -114,7 +116,23 @@ namespace EcommerceApi.Repositories
             return true;
         }
 
+        public async Task <dynamic?> LoginSeller( LoginSellerDTO login )
+        {
+            var parameters = new[]
+            {
+                new Npgsql.NpgsqlParameter("email", login.email),
+                new Npgsql.NpgsqlParameter("password", login.password)
+            };
 
+            dynamic? user;
+
+             user = await _dbContext.Set<UserDTO>().FromSqlRaw("SELECT * FROM sellers WHERE email = @email AND password = @password LIMIT 1;  ", parameters).FirstOrDefaultAsync();
+
+            if(user == null) return null;
+
+            return user;
+        
+        }
 
 
 

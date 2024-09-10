@@ -1,6 +1,7 @@
 using EcommerceApi.Data;
 using EcommerceApi.DTOs;
 using EcommerceApi.Models;
+using EcommerceApi.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace EcommerceApi.Repositories;
@@ -8,15 +9,22 @@ namespace EcommerceApi.Repositories;
 public class ClientsRepository
 {
     private readonly AppDbContext _dbContext;
+    private readonly TokenServices _tokenServices;
 
-        public ClientsRepository(AppDbContext dbContext)
+        public ClientsRepository(AppDbContext dbContext, TokenServices tokenServices)
         {
             _dbContext = dbContext;
+            _tokenServices = tokenServices;
         }
        
     public async Task<IEnumerable<Client>> GetAll()
         {
             return await _dbContext.Clients.ToListAsync();
+        }
+    
+    public async Task<IEnumerable<GetClientByEmialDto>> GetClientByEmail()
+        {
+            return await _dbContext.Set<GetClientByEmialDto>().ToListAsync();
         }
     public async Task<Client?> GetId( researchClientsDto researchClientsId )
         {
@@ -90,7 +98,27 @@ public class ClientsRepository
 
         }
             
+            public async Task <dynamic?> LoginClient( LoginClientDTO login )
+        {
+            var parameters = new[]
+            {
+                new Npgsql.NpgsqlParameter("email", login.email),
+                new Npgsql.NpgsqlParameter("password", login.password)
+            };
 
+            dynamic? user;
+
+             user = await _dbContext.Set<UserDTO>().FromSqlRaw("SELECT * FROM clients WHERE email = @email AND password = @password LIMIT 1;  ", parameters).FirstOrDefaultAsync();
+
+            if(user == null) return null;
+
+            string token = _tokenServices.GenerateToken();
+
+            user.token = token;
+
+            return token;
+        
+        }
 
 
 

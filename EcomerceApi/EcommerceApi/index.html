@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.0/signalr.min.js"></script>
+    <title>SignalR Client</title>
+</head>
+
+<body>
+    <h1>SignalR Client</h1>
+
+    <input type="text" id="messageInput" placeholder="Digite uma mensagem..." />
+    <button onclick="sendMessage()">Enviar</button>
+
+    <ul id="messagesList"></ul>
+
+    <script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("http://localhost:5001/chathub", { withCredentials: false })
+            .build();
+
+        connection.on("ReceiveMessage", function (user, message) {
+            const li = document.createElement("li");
+            li.textContent = `${user}: ${message}`;
+            document.getElementById("messagesList").appendChild(li);
+        });
+
+        connection.start().then(function () {
+            console.log("Conectado ao SignalR Hub");
+        }).catch(function (err) {
+            return console.error(err.toString());
+        });
+
+        function sendMessage() {
+            const message = document.getElementById("messageInput").value;
+            connection.invoke("SendMessageToAll", "Cliente", message).catch(function (err) {
+                return console.error(err.toString());
+            });
+        }
+    </script>
+</body>
+
+</html>

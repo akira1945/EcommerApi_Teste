@@ -46,4 +46,9 @@ namespace EcommerceApi.DTOs
 
     }
 
+    public class GetClientByEmialDto
+    {
+        public int id { get; set; }
+        public  string email { get; set; }
+    }
 }

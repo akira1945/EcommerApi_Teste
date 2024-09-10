@@ -17,11 +17,13 @@ namespace EcommerceApi.Controller
 
         private readonly SellersRepository _sellersRepository;
         private readonly SellersServices _sellersServices;
+        private readonly TokenServices _tokensServices;
 
-        public SellersController(SellersRepository sellersRepository, SellersServices sellersServices)
+        public SellersController(SellersRepository sellersRepository, SellersServices sellersServices, TokenServices tokensServices)
         {
             _sellersRepository = sellersRepository;
-            _sellersServices = sellersServices;
+            _sellersServices   = sellersServices;
+            _tokensServices = tokensServices;
         }
 
         [HttpGet]
@@ -103,6 +105,21 @@ namespace EcommerceApi.Controller
             }
 
             return Ok(seller);
+        }
+        
+        [HttpPost("login_seller")]
+        [Consumes("application/json")]
+
+        public async Task<ActionResult<dynamic?>> LoginSeller([FromBody] LoginSellerDTO logon)
+        {
+            var logonSeller = await _sellersRepository.LoginSeller(logon);
+            if(logonSeller == null) return BadRequest("User or Password Incorrect!!!");
+
+             var token = await _tokensServices.GenerateAndSaveToken();
+
+             logonSeller.token = token.token;
+
+            return Ok(logonSeller);
         }
 
 

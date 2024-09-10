@@ -1,5 +1,6 @@
 using EcommerceApi.Data;
 using EcommerceApi.Services;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 
 namespace EcommerceApi.Middlewares
@@ -8,7 +9,6 @@ namespace EcommerceApi.Middlewares
     {
         // 1 - Injetar o método next: Serve para dar Prosseguimento à requisição:
         private readonly RequestDelegate _next;
-
         public LoggingMiddlewares(RequestDelegate next)
         {
             _next = next;
@@ -22,30 +22,23 @@ namespace EcommerceApi.Middlewares
             string? path = context.Request.Path;
             string? method = context.Request.Method;
 
+
             Console.WriteLine($"Caminho: {path}");
             Console.WriteLine($"Método: {method}");
             Console.WriteLine($"Token: {token}");
 
-            var validToken = await dbContext.Tokens.FirstOrDefaultAsync(t => t.token == t.token);
-            if(validToken !=null )
+            if(path != "teste/login")
             {
-                tokenServices.Delete(validToken.token);
-            }
-            
-            if(path == "/publica")
-            {
-                Console.WriteLine($"Rota Liberada....");
-
-                var generatedToken = await tokenServices.Create();
-            }
-            else if (path == "/privada")
-            {
-                var savedToken = dbContext.Tokens.FirstOrDefault(t => t.token == token);
+                var savedToken = await dbContext.Tokens.FirstOrDefaultAsync(t => t.token == token);
                 if(savedToken == null)
                 {
                     context.Response.StatusCode = StatusCodes.Status403Forbidden;
                     await context.Response.WriteAsync("Acesso não autorizado");
                     return;
+                }
+                else
+                {
+                   tokenServices.Delete(savedToken.token);
                 }
                 
             }

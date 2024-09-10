@@ -64,8 +64,8 @@ public class OrdersRepository
     public async Task<List<Order?>?> List_orders_id(ListOrdersIdDto listId)
         {
             var vSql = $@"SELECT o.id, o.client_id, o.seller_id, o.delivery_type,
-                                    o.order_status, o.total_price, c.name AS client_name,
-                                    s.name AS seller_name
+                                 o.order_status, o.total_price, c.name AS client_name,
+                                 s.name AS seller_name
                                 FROM orders AS o
                         INNER JOIN clients AS c ON (o.client_id = c.id)
                         INNER JOIN sellers AS s ON (o.seller_id = s.id)
@@ -101,6 +101,17 @@ public class OrdersRepository
 
             return orders;
         }
+    
+    public async Task<IEnumerable<InsertedOrderDTO>> GetAllDetailedOne()
+    {
+        return await _dbContext.Set<InsertedOrderDTO>().FromSqlRaw(@"SELECT 
+                                                                            o.id, o.client_id, o.seller_id, o.delivery_type,o.order_status, o.total_price, 
+                                                                            c.name AS client_name, s.name AS seller_name,
+                                                                            c.email AS client_email, s.email AS seller_email
+                                                                       FROM orders AS o
+                                                                    INNER JOIN clients AS c ON (o.client_id = c.id)
+                                                                    INNER JOIN sellers AS s ON (o.seller_id = s.id" ).ToListAsync();
+    }
     
     public Order? Create( CreateOrderDto order_to_create )
         {

@@ -1,4 +1,5 @@
 using System.Security.Principal;
+using EcommerceApi.DTOs;
 using EcommerceApi.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,20 +21,18 @@ namespace EcommerceApi.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Client>().ToTable("clients");
-
             modelBuilder.Entity<Seller>().ToTable("sellers");
-
             modelBuilder.Entity<Product>().ToTable("products");
-
             modelBuilder.Entity<Order>().ToTable("orders");
-
             modelBuilder.Entity<Order_item>().ToTable("order_items");
-
             modelBuilder.Entity<Shopping_cart>().ToTable("shopping_cart");
-
-            modelBuilder.Entity<Shopping_cart_item>().ToTable("shopping_cart_item");
-            
+            modelBuilder.Entity<Shopping_cart_item>().ToTable("shopping_cart_item");         
             modelBuilder.Entity<Token>().ToTable("tokens");
+
+            modelBuilder.Entity<GetClientByEmialDto>().HasNoKey();
+            modelBuilder.Entity<InsertedOrderDTO>().HasNoKey();
+            modelBuilder.Entity<UserDTO>().HasNoKey();
+            modelBuilder.Entity<TestDTO>().HasNoKey();
 
             modelBuilder.Entity<Order>()
                 .HasMany(o => o.order_items)

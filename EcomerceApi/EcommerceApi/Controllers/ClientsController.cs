@@ -5,6 +5,7 @@ using EcommerceApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using EcommerceApi.Repositories;
+using EcommerceApi.Services;
 
 namespace EcommerceApi.Controllers
 {
@@ -14,10 +15,12 @@ namespace EcommerceApi.Controllers
     public class ClientsController : ControllerBase
     {
         private readonly ClientsRepository _clientsRepository; // Propriedade do banco de dados
+        private readonly TokenServices _tokenServices;
 
-        public ClientsController(ClientsRepository clientsRepository) // Construtor
+        public ClientsController (ClientsRepository clientsRepository, TokenServices tokenServices ) // Construtor
         {
             _clientsRepository = clientsRepository;
+            _tokenServices = tokenServices;
         }
 
         // Metodo para ler todos os clientes.
@@ -28,6 +31,14 @@ namespace EcommerceApi.Controllers
             var clients = await _clientsRepository.GetAll();
             return Ok(clients);
         }
+
+        [HttpGet("get_by_email")]
+        public async Task<ActionResult<IEnumerable<GetClientByEmialDto>>> GetByEmail()
+        {
+            var clients = await _clientsRepository.GetClientByEmail();
+            return Ok(clients);
+        }
+        
 
         // Metodo para Ler clientes por ID
         [HttpPost("researh_client")]
@@ -81,5 +92,17 @@ namespace EcommerceApi.Controllers
             
             return Ok($"Cadastro do cliente {deleteClients.name} excluído com sucesso!!!");
         }
+
+        [HttpPost("login_client")]
+        [Consumes("application/json")]
+
+        public async Task<ActionResult<dynamic?>> LoginClient([FromBody] LoginClientDTO logon)
+        {
+            var logonClient = await _clientsRepository.LoginClient(logon);
+            if(logonClient == null) return BadRequest("User or Password Incorrect!!!");
+                
+             return Ok(logonClient);
+        }
+
     }
 }
